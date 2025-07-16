@@ -1,11 +1,9 @@
 import requests
 import configuration
-import data
 
-
-def get_new_user_token():
+def post_new_user():
     user_body = {
-        "firstName": "Juan",
+        "firstName": "Gabriel",
         "phone": "+12345678901",
         "address": "Calle Falsa 123"
     }
@@ -16,5 +14,4 @@ def post_new_client_kit(kit_body, auth_token):
     headers = {
         "Authorization": f"Bearer {auth_token}"
     }
-    response = requests.post(URL_SERVICE + CREATE_KIT_PATH, headers=headers, json=kit_body)
-    return response
+    return requests.post(URL_SERVICE + CREATE_KIT_PATH, headers=headers, json=kit_body)
