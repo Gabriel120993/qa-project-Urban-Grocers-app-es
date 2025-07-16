@@ -1,63 +1,48 @@
+import configuration
 import data
-from sender_stand_request import post_new_user, post_new_client_kit
+import sender_stand_request
 
-# Función que genera el cuerpo del kit con nombre dinámico
+
 def get_kit_body(name):
-    current_body = data.kit_body.copy()
-    current_body["name"] = name
-    return current_body
+    return {"name": name}
 
-# Función para pruebas positivas
+# Tests positivos
 def positive_assert(kit_body):
-    token = post_new_user()
-    response = post_new_client_kit(kit_body, token)
+    token = get_new_user_token()
+    response = post_new_client_kit(kit_body.copy(), token)
     assert response.status_code == 201
     assert response.json()["name"] == kit_body["name"]
 
-# Función para pruebas negativas (espera código 400)
+# Tests negativos
 def negative_assert_code_400(kit_body):
-    token = post_new_user()
-    response = post_new_client_kit(kit_body, token)
+    token = get_new_user_token()
+    response = post_new_client_kit(kit_body.copy(), token)
     assert response.status_code == 400
 
-# Pruebas positivas
+# Tests individuales
+def test_kit_name_1_char():
+    positive_assert(kit_body_1_char)
 
-def test_create_kit_1_letter_in_name_get_success_response():
-    kit_body = get_kit_body("g")
-    positive_assert(kit_body)
+def test_kit_name_511_chars():
+    positive_assert(kit_body_511_chars)
 
-def test_create_kit_511_letters_in_name_get_success_response():
-    kit_body = {"name":"AbcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdAbcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabC"}
-    positive_assert(kit_body)
+def test_kit_name_empty():
+    negative_assert_code_400(kit_body_empty)
 
-def test_create_kit_special_characters_in_name_get_success_response():
-    kit_body = get_kit_body("№%@,")
-    positive_assert(kit_body)
+def test_kit_name_512_chars():
+    negative_assert_code_400(kit_body_512_chars)
 
-def test_create_kit_name_with_spaces_get_success_response():
-    kit_body = get_kit_body(" G Bernabe ")
-    positive_assert(kit_body)
+def test_kit_name_special_chars():
+    positive_assert(kit_body_special_chars)
 
-def test_create_kit_name_with_numbers_get_success_response():
-    kit_body = get_kit_body("123")
-    positive_assert(kit_body)
+def test_kit_name_spaces():
+    positive_assert(kit_body_spaces)
 
-# Pruebas negativas
+def test_kit_name_numbers():
+    positive_assert(kit_body_numbers)
 
-def test_create_kit_empty_name_get_error_400():
-    kit_body = get_kit_body("")
-    negative_assert_code_400(kit_body)
+def test_kit_name_missing_name():
+    negative_assert_code_400(kit_body_missing_name)
 
-def test_create_kit_512_letters_in_name_get_error_400():
-    kit_body = {"name":"AbcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdAbcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcD"}
-    negative_assert_code_400(kit_body)
-
-def test_create_kit_without_name_get_error_400():
-    token = post_new_user()
-    response = post_new_client_kit({}, token)
-    assert response.status_code == 400
-
-def test_create_kit_number_as_name_get_error_400():
-    token = post_new_user()
-    response = post_new_client_kit({"name": 123}, token)
-    assert response.status_code == 400
+def test_kit_name_wrong_type():
+    negative_assert_code_400(kit_body_wrong_type)
